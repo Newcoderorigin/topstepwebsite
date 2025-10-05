@@ -84,3 +84,6 @@ Visit `http://localhost:5173` to view the Command Center UI.
 - Harden authentication before production use. Current implementation assumes a trusted environment.
 - Always validate strategy hit rate remains within 55–61% band. Consider automated alerts when breaching.
 - Extend `ContextStore` with persistent storage (Redis/Postgres) before scaling beyond prototype.
+
+### Troubleshooting
+- If the launcher exits with `Unable to locate the unicorn executable`, install unicorn and ensure `unicorn` (or `unicorn.cmd` on Windows) is in your `PATH` before running `python main.py`.
