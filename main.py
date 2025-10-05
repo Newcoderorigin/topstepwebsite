@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import shutil
 import signal
 import subprocess
 import sys
@@ -35,6 +36,21 @@ def ensure_directories_exist() -> None:
             raise FileNotFoundError(f"Expected directory missing: {path}")
 
 
+def find_npm_executable() -> str:
+    candidates = ["npm"]
+    if os.name == "nt":
+        candidates.insert(0, "npm.cmd")
+
+    for candidate in candidates:
+        path = shutil.which(candidate)
+        if path:
+            return path
+
+    raise RuntimeError(
+        "Unable to locate the npm executable. Install Node.js/npm or update your PATH before launching."
+    )
+
+
 def run_process(command: Iterable[str], cwd: Path) -> subprocess.Popen:
     env = os.environ.copy()
     return subprocess.Popen(command, cwd=str(cwd), env=env)
@@ -43,11 +59,13 @@ def run_process(command: Iterable[str], cwd: Path) -> subprocess.Popen:
 def launch_services(target: str) -> List[subprocess.Popen]:
     ensure_directories_exist()
 
+    npm_executable = find_npm_executable()
+
     processes: List[subprocess.Popen] = []
     if target in {"all", "backend"}:
-        processes.append(run_process(["npm", "run", "dev"], BACKEND_DIR))
+        processes.append(run_process([npm_executable, "run", "dev"], BACKEND_DIR))
     if target in {"all", "frontend"}:
-        processes.append(run_process(["npm", "run", "dev"], FRONTEND_DIR))
+        processes.append(run_process([npm_executable, "run", "dev"], FRONTEND_DIR))
     return processes
 
 
@@ -69,7 +87,11 @@ def main(argv: Iterable[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(list(argv) if argv is not None else None)
 
-    processes = launch_services(args.target)
+    try:
+        processes = launch_services(args.target)
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
     if not processes:
         parser.error("No processes launched")
     try:
