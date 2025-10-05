@@ -42,20 +42,17 @@ PORT=4000
 
 The frontend uses Vite defaults and proxies `/api` to `http://localhost:4000` during development.
 
-### 3. Launch services (one-shot)
+### 3. Run backend
 ```bash
-python main.py          # starts backend + frontend together
+cd backend
+npm run dev
 ```
 
-Use the optional target flag to run a single service:
-
+### 4. Run frontend
 ```bash
-python main.py backend  # backend only
-python main.py frontend # frontend only
+cd frontend
+npm run dev
 ```
-
-The script forwards stdout/stderr from the underlying `npm run dev` tasks. Press `Ctrl+C` once to stop both processes gracefully.
-
 Visit `http://localhost:5173` to view the Command Center UI.
 
 ## Risk Controls & User Context
