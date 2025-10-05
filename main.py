@@ -36,10 +36,10 @@ def ensure_directories_exist() -> None:
             raise FileNotFoundError(f"Expected directory missing: {path}")
 
 
-def find_unicorn_executable() -> str:
-    candidates = ["unicorn"]
+def find_npm_executable() -> str:
+    candidates = ["npm"]
     if os.name == "nt":
-        candidates.insert(0, "unicorn.cmd")
+        candidates.insert(0, "npm.cmd")
 
     for candidate in candidates:
         path = shutil.which(candidate)
@@ -47,7 +47,7 @@ def find_unicorn_executable() -> str:
             return path
 
     raise RuntimeError(
-        "Unable to locate the unicorn executable. Install unicorn or update your PATH before launching."
+        "Unable to locate the npm executable. Install Node.js/npm or update your PATH before launching."
     )
 
 
@@ -59,13 +59,13 @@ def run_process(command: Iterable[str], cwd: Path) -> subprocess.Popen:
 def launch_services(target: str) -> List[subprocess.Popen]:
     ensure_directories_exist()
 
-    unicorn_executable = find_unicorn_executable()
+    npm_executable = find_npm_executable()
 
     processes: List[subprocess.Popen] = []
     if target in {"all", "backend"}:
-        processes.append(run_process([unicorn_executable, "run", "dev"], BACKEND_DIR))
+        processes.append(run_process([npm_executable, "run", "dev"], BACKEND_DIR))
     if target in {"all", "frontend"}:
-        processes.append(run_process([unicorn_executable, "run", "dev"], FRONTEND_DIR))
+        processes.append(run_process([npm_executable, "run", "dev"], FRONTEND_DIR))
     return processes
 
 

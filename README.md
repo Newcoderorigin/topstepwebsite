@@ -86,4 +86,4 @@ Visit `http://localhost:5173` to view the Command Center UI.
 - Extend `ContextStore` with persistent storage (Redis/Postgres) before scaling beyond prototype.
 
 ### Troubleshooting
-- If the launcher exits with `Unable to locate the unicorn executable`, install unicorn and ensure `unicorn` (or `unicorn.cmd` on Windows) is in your `PATH` before running `python main.py`.
+- If the launcher exits with `Unable to locate the npm executable`, install Node.js/npm and ensure `npm` (or `npm.cmd` on Windows) is in your `PATH` before running `python main.py`.
