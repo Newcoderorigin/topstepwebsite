@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Journal</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --bg: #f4f4f6;
+        --fg: #1f2430;
+        --muted: #5c6270;
+        --accent: #3a7afe;
+      }
+
+      [data-theme="dark"] {
+        --bg: #12141c;
+        --fg: #f5f7fb;
+        --muted: #a3a9ba;
+        --accent: #7aa2ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 24px;
+        background: var(--bg);
+        color: var(--fg);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      main {
+        width: min(720px, 100%);
+        display: grid;
+        gap: 24px;
+        background: color-mix(in srgb, var(--bg) 94%, black 6%);
+        border: 1px solid color-mix(in srgb, var(--fg) 12%, transparent 88%);
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+      }
+
+      header {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+        letter-spacing: -0.02em;
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+
+      label {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      input[type="date"] {
+        border: 1px solid color-mix(in srgb, var(--muted) 30%, transparent 70%);
+        border-radius: 10px;
+        padding: 8px 12px;
+        background: color-mix(in srgb, var(--bg) 88%, white 12%);
+        color: inherit;
+        font: inherit;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 320px;
+        resize: vertical;
+        border-radius: 14px;
+        padding: 20px;
+        border: 1px solid color-mix(in srgb, var(--muted) 25%, transparent 75%);
+        background: color-mix(in srgb, var(--bg) 84%, white 16%);
+        color: inherit;
+        font: 1rem/1.6 "Inter", system-ui, sans-serif;
+        outline: none;
+        transition: border-color 0.2s ease;
+      }
+
+      textarea:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent 70%);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      button {
+        border: none;
+        border-radius: 999px;
+        padding: 10px 18px;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      .export-btn {
+        background: var(--accent);
+        color: white;
+        box-shadow: 0 12px 24px rgba(58, 122, 254, 0.2);
+      }
+
+      .export-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 30px rgba(58, 122, 254, 0.25);
+      }
+
+      .toggle {
+        position: relative;
+        width: 56px;
+        height: 30px;
+        background: color-mix(in srgb, var(--muted) 25%, transparent 75%);
+        border-radius: 999px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        padding: 4px;
+        transition: background 0.2s ease;
+      }
+
+      .toggle[data-active="true"] {
+        background: var(--accent);
+      }
+
+      .toggle span {
+        display: inline-block;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--bg);
+        transform: translateX(0);
+        transition: transform 0.2s ease;
+      }
+
+      .toggle[data-active="true"] span {
+        transform: translateX(26px);
+      }
+
+      .status {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      footer {
+        font-size: 0.85rem;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      footer a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 16px;
+        }
+
+        main {
+          padding: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Daily Journal</h1>
+        <div class="controls">
+          <label for="entry-date">Entry Date</label>
+          <input type="date" id="entry-date" />
+        </div>
+      </header>
+
+      <section>
+        <textarea id="entry" placeholder="Capture today's reflections, wins, challenges, or ideas..."></textarea>
+        <p class="status" id="status">Autosave is on.</p>
+      </section>
+
+      <div class="actions">
+        <div class="theme-toggle">
+          <span aria-hidden="true">☀️</span>
+          <button id="theme-toggle" class="toggle" type="button" aria-label="Toggle dark mode" role="switch" aria-checked="false">
+            <span></span>
+          </button>
+          <span aria-hidden="true">🌙</span>
+        </div>
+        <button class="export-btn" id="export" type="button">Export Day as .txt</button>
+      </div>
+
+      <footer>
+        Crafted with care. <a href="https://buymeacoffee.com/topstepjournal" target="_blank" rel="noopener noreferrer">Support this project</a>
+      </footer>
+    </main>
+
+    <script>
+      (function () {
+        const storageKey = "daily-journal-entries";
+        const themeKey = "daily-journal-theme";
+        const entryField = document.getElementById("entry");
+        const dateInput = document.getElementById("entry-date");
+        const statusEl = document.getElementById("status");
+        const toggle = document.getElementById("theme-toggle");
+        const exportBtn = document.getElementById("export");
+
+        const today = new Date();
+        const pad = (value) => String(value).padStart(2, "0");
+        const toDateString = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+
+        const loadEntries = () => {
+          try {
+            const stored = localStorage.getItem(storageKey);
+            return stored ? JSON.parse(stored) : {};
+          } catch (error) {
+            console.warn("Unable to parse stored journal entries", error);
+            return {};
+          }
+        };
+
+        const saveEntries = (entries) => {
+          localStorage.setItem(storageKey, JSON.stringify(entries));
+        };
+
+        const entries = loadEntries();
+        let currentDate = null;
+
+        const setDate = (value) => {
+          currentDate = value;
+          dateInput.value = value;
+          entryField.value = entries[value] || "";
+          updateStatus("Loaded entry", 1200);
+        };
+
+        const loadTheme = () => {
+          const storedTheme = localStorage.getItem(themeKey);
+          const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+          return storedTheme || (prefersDark ? "dark" : "light");
+        };
+
+        const applyTheme = (mode) => {
+          document.documentElement.dataset.theme = mode;
+          toggle.dataset.active = String(mode === "dark");
+          toggle.setAttribute("aria-checked", String(mode === "dark"));
+        };
+
+        const persistTheme = (mode) => {
+          localStorage.setItem(themeKey, mode);
+        };
+
+        const updateStatus = (message, timeout = 0) => {
+          statusEl.textContent = message;
+          if (timeout) {
+            window.clearTimeout(updateStatus.timer);
+            updateStatus.timer = window.setTimeout(() => {
+              statusEl.textContent = "Autosave is on.";
+            }, timeout);
+          }
+        };
+
+        const scheduleSave = (() => {
+          let timer = null;
+          return (dateKey, content) => {
+            if (timer) window.clearTimeout(timer);
+            timer = window.setTimeout(() => {
+              entries[dateKey] = content.trim();
+              saveEntries(entries);
+              updateStatus("Saved locally.", 1500);
+            }, 400);
+          };
+        })();
+
+        dateInput.addEventListener("change", (event) => {
+          const selected = event.target.value;
+          if (!selected) return;
+          if (currentDate) {
+            entries[currentDate] = entryField.value.trim();
+            saveEntries(entries);
+          }
+          setDate(selected);
+          updateStatus("Switched day.", 1200);
+        });
+
+        entryField.addEventListener("input", () => {
+          const key = currentDate || dateInput.value;
+          if (!key) return;
+          updateStatus("Saving…");
+          scheduleSave(key, entryField.value);
+        });
+
+        toggle.addEventListener("click", () => {
+          const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+          applyTheme(next);
+          persistTheme(next);
+        });
+
+        exportBtn.addEventListener("click", () => {
+          const dateKey = currentDate || dateInput.value;
+          const content = entryField.value.trim();
+          const blob = new Blob([content || ""], { type: "text/plain" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `journal-${dateKey || toDateString(new Date())}.txt`;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          URL.revokeObjectURL(url);
+        });
+
+        const init = () => {
+          const startDate = toDateString(today);
+          setDate(startDate);
+          applyTheme(loadTheme());
+          persistTheme(document.documentElement.dataset.theme);
+        };
+
+        init();
+      })();
+    </script>
+  </body>
+</html>
