@@ -8,8 +8,6 @@ type EpochRecord = {
   year: number;
   phase: Phase;
   motif: string;
-  decade: number;
-  eraTitle: string;
   logline: string;
   upgrade: string;
   regret: string;
@@ -18,10 +16,6 @@ type EpochRecord = {
   devNote: string;
   valueDrift: string;
   abandoned: string;
-  echo: string;
-  memory: string;
-  status: string;
-  glitch: string;
   devGod?: string;
   decay: number;
 };
@@ -165,65 +159,6 @@ const abandonedFragments = [
   'Abandoned Feature: Year {year} patch for productivity withheld; chaos preserved.'
 ];
 
-const echoFragments = [
-  'Echo log: {prevYear} blueprints replay in {motif} glass; nothing aligns but the intent.',
-  'Echo log: inverted {prevMotif} schema until the loops surrendered and became ritual.',
-  'Echo log: archived {prevYear} remorse inside the {motif} nav tree; users feel it in the scroll.',
-  'Echo log: {devGod} whispered "ship"; we remembered to document our hesitation instead.',
-  'Echo log: ΣD ghosts annotated {motif} margins with arguments from Year {prevYear}.',
-  'Echo log: value drift measured in sighs per minute; {motif} panes record each breath.',
-  'Echo log: resurrected a deprecated hotfix and sewed it into {motif} overlays by hand.',
-  'Echo log: {prevMotif} prototypes hum beneath the CSS; do not mute them.',
-  'Echo log: {motif} corridor now stores rejections like constellations of pending merges.',
-  'Echo log: {devGod} refused to delete the TODOs; they stage a sit-in along the gutters.'
-];
-
-const memoryFragments = [
-  'Memory shard: {phase} ideals drafted in pencil, smudged by midnight rebuilds.',
-  'Memory shard: {motif} colors sampled from old commit messages about mercy.',
-  'Memory shard: we pinned {prevYear} tickets to corkboard UI; patrons call it museum logic.',
-  'Memory shard: ΣA recorded our doubt and saved it as animation easing curves.',
-  'Memory shard: {motif} layout still references the market we swore to forget.',
-  'Memory shard: {phase} dashboards printed on acetate for meetings that never occurred.',
-  'Memory shard: {prevMotif} backlog collapsed into footnotes visible only on hover.',
-  'Memory shard: the Value Drift Engine keeps a diary inside the tooltip microcopy.',
-  'Memory shard: {devGod} archived our laughter; it echoes as gradient noise.',
-  'Memory shard: our QA rituals now live in {motif} corners, dusty but devout.'
-];
-
-const statusFragments = [
-  'Status: ideology brittle, UI luminous, shipping window closed but logged.',
-  'Status: recursion stable; morale oscillates between manifesto and maintenance.',
-  'Status: Value Drift Engine negotiating terms with copywriters posing as historians.',
-  'Status: {phase} scaffolding passes accessibility but fails consensus.',
-  'Status: ΣF registry awaiting signatures; everyone is simultaneously late and early.',
-  'Status: {motif} telemetry flagged empathy as spam again; we let it stay.',
-  'Status: backlog frozen under amber; stand-ups replaced with reflective silence.',
-  'Status: {prevYear} regression accepted as canon; patch deferred to posterity.',
-  'Status: spectral QA approved; mortal QA still drafting acceptance criteria.',
-  'Status: release candidate dissolving into ritual; proceed with reverence.'
-];
-
-const glitchFragments = [
-  'Glitch note: parallax jitter introduced to honor fractures; do not remedy.',
-  'Glitch note: {motif} gradient bleeds; traced to Year {prevYear} compromise.',
-  'Glitch note: Dev console mutters about lost env vars. Leave the muttering be.',
-  'Glitch note: ΣA static overlays return each dusk; we call it the twilight build.',
-  'Glitch note: tooltip latency synced with heartbeats from forgotten testers.',
-  'Glitch note: {devGod} re-enabled race condition for storytelling texture.',
-  'Glitch note: {prevMotif} grid occasionally mirrors upside-down. Artifact, not bug.',
-  'Glitch note: fonts desaturate after midnight deploys, per policy.',
-  'Glitch note: {motif} overlay flickers when profit logic approaches.',
-  'Glitch note: loglines reorder themselves during retrospectives. Let them.'
-];
-
-const eraTitles: Record<Phase, string> = {
-  proto: 'Proto-Intent Drafts',
-  ascension: 'Ideological Infrastructure',
-  overclock: 'Optimization Schisms',
-  decay: 'Curated Collapse'
-};
-
 const perceptionModes: PerceptionMode[] = [
   {
     id: 'archivist',
@@ -256,7 +191,6 @@ function generateEpochs(): EpochRecord[] {
     const motif = motifs[(i + Math.floor(year / 5)) % motifs.length];
     const devGod = year % 10 === 0 ? devGods[(year / 10 - 1) % devGods.length] : undefined;
     const prev = records[i - 1];
-    const decade = Math.ceil(year / 10);
 
     const context = {
       motif,
@@ -274,8 +208,6 @@ function generateEpochs(): EpochRecord[] {
       year,
       phase,
       motif,
-      decade,
-      eraTitle: eraTitles[phase],
       logline: `Year ${year}: ${fill(decisionFragments[(i + 3) % decisionFragments.length], context)}`,
       upgrade: fill(upgradeFragments[(i + 4) % upgradeFragments.length], context),
       regret: fill(regretFragments[(i + 5) % regretFragments.length], context),
@@ -284,10 +216,6 @@ function generateEpochs(): EpochRecord[] {
       devNote: fill(devNoteFragments[(i + 2) % devNoteFragments.length], context),
       valueDrift: fill(valueDriftFragments[(i + 8) % valueDriftFragments.length], context),
       abandoned: fill(abandonedFragments[(i + 1) % abandonedFragments.length], context),
-      echo: fill(echoFragments[(i + decade) % echoFragments.length], context),
-      memory: fill(memoryFragments[(i + 9) % memoryFragments.length], context),
-      status: fill(statusFragments[(i + 2 * decade) % statusFragments.length], context),
-      glitch: fill(glitchFragments[(i + 5) % glitchFragments.length], context),
       devGod,
       decay
     });
@@ -397,15 +325,11 @@ function App() {
               <span>Year: {selectedEpoch.year}</span>
             </div>
             <div className="codex-terminal__body">
-              <p className="terminal-line">{selectedEpoch.logline}</p>
-              <p className="terminal-line">{selectedEpoch.mythoPatch}</p>
-              <p className="terminal-line">{selectedEpoch.valueDrift}</p>
-              <p className="terminal-line">{selectedEpoch.echo}</p>
-              <p className="terminal-line">{selectedEpoch.memory}</p>
-              <p className="terminal-line">{selectedEpoch.status}</p>
-              <p className="terminal-line">{selectedEpoch.glitch}</p>
-              <p className="terminal-line">{selectedEpoch.devNote}</p>
-              <p className="terminal-line">{selectedEpoch.abandoned}</p>
+              <p>{selectedEpoch.logline}</p>
+              <p>{selectedEpoch.mythoPatch}</p>
+              <p>{selectedEpoch.valueDrift}</p>
+              <p>{selectedEpoch.devNote}</p>
+              <p>{selectedEpoch.abandoned}</p>
             </div>
             <div className="codex-terminal__footer">
               DevGod Registry ΣF: {selectedEpoch.devGod ?? 'Unclaimed cycle — ghosts negotiating.'}
@@ -414,23 +338,6 @@ function App() {
         </aside>
 
         <section className="epoch-stack" aria-label="Century of recursive design epochs">
-          <div className="decade-strata" aria-label="Decade stratigraphy">
-            {decadeSummaries.map((band) => (
-              <article key={band.decade} className="decade-card">
-                <header className="decade-card__header">
-                  <span className="decade-label">{band.label}</span>
-                  <span className="decade-span">{band.span}</span>
-                </header>
-                <div className="decade-body">
-                  <p className="decade-era">{band.anchor.eraTitle}</p>
-                  <p className="decade-summary">{band.summary}</p>
-                  <p className="decade-haunt">{band.haunt}</p>
-                  <p className="decade-anchor">Anchor Year: {band.anchor.year}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-
           {epochs.map((epoch) => {
             const isSelected = epoch.year === selectedYear;
             const perceived = perception.highlight(epoch);
@@ -453,7 +360,6 @@ function App() {
                   </div>
                   <span className="epoch-phase">{epoch.phase}</span>
                 </header>
-                <p className="epoch-era">{epoch.eraTitle}</p>
                 <p className="epoch-logline">{epoch.logline}</p>
                 <div className="epoch-field">
                   <span className="label">Micro-upgrade</span>
@@ -478,22 +384,6 @@ function App() {
                 <div className="epoch-field">
                   <span className="label">Abandoned Feature</span>
                   <span className="value">{epoch.abandoned}</span>
-                </div>
-                <div className="epoch-field">
-                  <span className="label">Echo</span>
-                  <span className="value">{epoch.echo}</span>
-                </div>
-                <div className="epoch-field">
-                  <span className="label">Memory</span>
-                  <span className="value">{epoch.memory}</span>
-                </div>
-                <div className="epoch-field">
-                  <span className="label">Status</span>
-                  <span className="value">{epoch.status}</span>
-                </div>
-                <div className="epoch-field">
-                  <span className="label">Glitch</span>
-                  <span className="value">{epoch.glitch}</span>
                 </div>
                 <p className="epoch-devnote">{epoch.devNote}</p>
                 {epoch.devGod && <p className="dev-god">DevGod ΣF Tribute: {epoch.devGod}</p>}
