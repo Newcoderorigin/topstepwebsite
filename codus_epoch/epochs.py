@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Iterable, List, Sequence, Tuple
+from typing import Iterable, List, Sequence
 import random
 
 from .glitch import GlitchArtifact, echo_decay, inject_glitch, spawn_artifact
@@ -48,6 +49,12 @@ REGRET_LIBRARY: Sequence[Tuple[str, str]] = (
 )
 
 REGRET_ECHOES: Sequence[str] = (
+REGRET_PATTERNS: Sequence[str] = (
+    "Forgot to document the rebellion of the UI margins.",
+    "Overfit the emotion model; it now predicts only dread.",
+    "Lost the original palette while renaming variables at midnight.",
+    "Promised transparency, delivered recursive fog.",
+    "Agreed to remove the chaos slider—then installed three hidden ones.",
     "Merged conflict branches without asking the ghosts for consent.",
     "Hid the onboarding manual inside a bug report as a dare.",
     "Tried to delete ideology from the layout; ideology deleted the layout instead.",
@@ -177,6 +184,7 @@ def generate_epoch_stack(seed: int = 2084) -> EpochStack:
 
         upgrade = _choose(UPGRADE_PATTERNS, rng)
         regret_anchor, regret = _choose(REGRET_LIBRARY, rng)
+        regret = _choose(REGRET_PATTERNS, rng)
         status = _choose(STATUS_PATTERNS, rng)
         mythopatch = _choose(MYTHOPATCH_LOGS, rng).format(year=year)
         ghost = _choose(GHOST_PATTERNS, rng)
@@ -187,6 +195,9 @@ def generate_epoch_stack(seed: int = 2084) -> EpochStack:
         regret_log = [regret, _choose(REGRET_ECHOES, rng)]
         patch_fragment = _choose(PATCHLORE_ARTIFACTS, rng)
         patch_lore = [patch_fragment, mythopatch]
+        regret_log = [regret, _choose(REGRET_PATTERNS, rng)]
+        patch_lore = [mythopatch, _choose(MYTHOPATCH_LOGS, rng).format(year=year)]
+
         logline = (
             f"Year {year}: After {last_upgrade}, the council doubted the {last_status} promise. "
             f"We {upgrade} before the committee dissolved again."
@@ -236,3 +247,4 @@ def generate_epoch_stack(seed: int = 2084) -> EpochStack:
         reflections=reflections,
         decay_logs=echo_decay(decay_notes),
     )
+    return EpochStack(epochs=epochs, echoes=echoes, reflections=reflections)

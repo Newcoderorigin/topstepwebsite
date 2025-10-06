@@ -13,6 +13,7 @@ WIDTH, HEIGHT = 1280, 720
 MARGIN = 60
 TIMELINE_X = 180
 LINE_HEIGHT = 110
+LINE_HEIGHT = 72
 CARD_WIDTH = WIDTH - TIMELINE_X - MARGIN
 HEADER_HEIGHT = 140
 BACKGROUND_COLORS = [(15, 9, 21), (32, 24, 46), (12, 20, 28)]
@@ -125,11 +126,18 @@ class EpochViewer:
             mix = i / WIDTH
             tint = self._interpolate_color(anchor_color, (12, 12, 18), mix * 0.6)
             shade = (tint[0], tint[1], tint[2])
+        for idx, color in enumerate(BACKGROUND_COLORS):
+            rect = pygame.Rect(0, HEIGHT // len(BACKGROUND_COLORS) * idx, WIDTH, HEIGHT // len(BACKGROUND_COLORS) + 1)
+            pygame.draw.rect(self.screen, color, rect)
+        # overlay faint noise stripes to hint at decay
+        for i in range(0, WIDTH, 24):
+            shade = (12 + (i * 3) % 24, 12, 18)
             pygame.draw.line(self.screen, shade, (i, 0), (i, HEIGHT), 1)
 
     def _draw_header(self) -> None:
         title = "CODUS-EPOCH: 100 YEARS OF UNFINISHED MEMORY"
         subtitle = "Arrow keys / mouse wheel to navigate. Mythopatch & decay bands annotate ideological drift."
+        subtitle = "Arrow keys / mouse wheel to navigate. Mythopatch logs preserve ideological drift."
         overlay = pygame.Surface((WIDTH, HEADER_HEIGHT), pygame.SRCALPHA)
         overlay.fill((10, 8, 16, 210))
         self.screen.blit(overlay, (0, 0))
@@ -177,6 +185,10 @@ class EpochViewer:
 
     def _draw_epoch_card(self, idx: int, epoch: Epoch, y: float, decay: float) -> None:
         card_height = LINE_HEIGHT - 12
+            self._draw_epoch_card(epoch, card_y, decay)
+
+    def _draw_epoch_card(self, epoch: Epoch, y: float, decay: float) -> None:
+        card_height = LINE_HEIGHT - 8
         decay_color = self._interpolate_color(PALETTE.accent, PALETTE.faded, decay)
         card_rect = pygame.Rect(TIMELINE_X + 20, y, CARD_WIDTH - 40, card_height)
 
@@ -193,6 +205,11 @@ class EpochViewer:
 
         pygame.draw.rect(self.screen, decay_color, card_rect, 2)
         glitch_amplitude = math.sin(self.glitch_seed + epoch.year * 0.33) * 2.2
+        overlay.fill((int(40 + 120 * (1 - decay)), int(20 + 60 * (1 - decay)), int(60 + 120 * (1 - decay)), 165))
+        self.screen.blit(overlay, card_rect.topleft)
+
+        pygame.draw.rect(self.screen, decay_color, card_rect, 2)
+        glitch_amplitude = math.sin(self.glitch_seed + epoch.year * 0.33) * 4
         pygame.draw.rect(
             self.screen,
             (decay_color[0], max(0, decay_color[1] - 60), decay_color[2]),
@@ -230,6 +247,23 @@ class EpochViewer:
         if len(epoch.patch_lore) > 1 and revealed:
             myth_echo = self.font_small.render(epoch.patch_lore[1], True, self._fade_color(PALETTE.glyph, 0.6))
             self.screen.blit(myth_echo, (text_x, y + card_height - 18))
+        logline_lines = self._wrap_text(epoch.logline, self.font_small, card_rect.width - 32)
+        for i, line in enumerate(logline_lines[:2]):
+            self.screen.blit(self.font_small.render(line, True, PALETTE.text_secondary), (text_x, y + 32 + i * 18))
+
+        glitch_lines = self._wrap_text(epoch.glitch_trace, self.font_glitch, card_rect.width - 32)
+        if glitch_lines:
+            glitch_color = self._fade_color(PALETTE.glyph, min(1.0, decay + 0.2))
+            self.screen.blit(self.font_glitch.render(glitch_lines[0], True, glitch_color), (text_x, y + card_height - 46))
+
+        if epoch.patch_lore:
+            myth = self.font_small.render(epoch.patch_lore[0], True, PALETTE.glyph)
+            self.screen.blit(myth, (text_x, y + card_height - 28))
+        if len(epoch.patch_lore) > 1:
+            myth_echo = self.font_small.render(epoch.patch_lore[1], True, self._fade_color(PALETTE.glyph, 0.6))
+            self.screen.blit(myth_echo, (text_x, y + card_height - 14))
+        myth = self.font_small.render(epoch.mythopatch, True, PALETTE.glyph)
+        self.screen.blit(myth, (text_x, y + card_height - 22))
 
         # decorative artifacts as runes along the edge
         glyph_y = y + 10
@@ -251,6 +285,8 @@ class EpochViewer:
             if epoch.regret_log:
                 echo_surface = self.font_glitch.render(epoch.regret_log[1], True, self._fade_color(PALETTE.text_secondary, decay))
                 self.screen.blit(echo_surface, (text_x, y + card_height - 16))
+                regret_text = self.font_glitch.render(epoch.regret_log[0], True, self._fade_color(PALETTE.text_secondary, decay))
+                self.screen.blit(regret_text, (text_x, y + card_height - 62))
 
     def _draw_reflection_strip(self) -> None:
         strip_height = 90
@@ -269,6 +305,11 @@ class EpochViewer:
 
         hint = "Hold Q or ESC to exit. HOME/END to jump across the century."
         self.screen.blit(self.font_small.render(hint, True, PALETTE.faded), (MARGIN, HEIGHT - strip_height + 76))
+        self.screen.blit(self.font_small.render(reflection, True, PALETTE.text_primary), (MARGIN, HEIGHT - strip_height + 16))
+        self.screen.blit(self.font_small.render(echo, True, PALETTE.text_secondary), (MARGIN, HEIGHT - strip_height + 44))
+
+        hint = "Hold Q or ESC to exit. HOME/END to jump across the century."
+        self.screen.blit(self.font_small.render(hint, True, PALETTE.faded), (MARGIN, HEIGHT - strip_height + 68))
 
     def _draw_footer(self) -> None:
         glitch = math.sin(self.glitch_seed * 2.1)
