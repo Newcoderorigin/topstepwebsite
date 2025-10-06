@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Iterable, List, Sequence, Tuple
+from typing import Iterable, List, Sequence
 import random
 
 from .glitch import GlitchArtifact, echo_decay, inject_glitch, spawn_artifact
@@ -21,7 +22,7 @@ DEV_GODS = [
     "The Sleep-Deprived Chorale",
 ]
 
-UPGRADE_PATTERNS: Sequence[str] = [
+UPGRADE_PATTERNS: Sequence[str] = (
     "invented a perception dial that refuses to settle on consensus",
     "modulated the archive UI into manifesto columns",
     "implemented ritual caching—records must be sung twice before retrieval",
@@ -32,9 +33,9 @@ UPGRADE_PATTERNS: Sequence[str] = [
     "introduced a phantom CLI that echoes only deprecated commands",
     "allowed epochs to annotate themselves with warnings about future rewrites",
     "compressed the civic memory into a single glitch glyph nobody can decode",
-]
+)
 
-REGRET_LIBRARY: Sequence[Tuple[str, str]] = [
+REGRET_LIBRARY: Sequence[Tuple[str, str]] = (
     ("deadline fracture", "Archived emotional module to meet deadline."),
     ("memory purge", "Deleted truth object to reduce memory leaks."),
     ("autonomy denial", "Refused player autonomy in late build phase."),
@@ -45,17 +46,23 @@ REGRET_LIBRARY: Sequence[Tuple[str, str]] = [
     ("palette loss", "Lost the original palette while renaming variables at midnight."),
     ("fog promise", "Promised transparency, delivered recursive fog."),
     ("chaos relapse", "Agreed to remove the chaos slider—then installed three hidden ones."),
-]
+)
 
-REGRET_ECHOES: Sequence[str] = [
+REGRET_ECHOES: Sequence[str] = (
+REGRET_PATTERNS: Sequence[str] = (
+    "Forgot to document the rebellion of the UI margins.",
+    "Overfit the emotion model; it now predicts only dread.",
+    "Lost the original palette while renaming variables at midnight.",
+    "Promised transparency, delivered recursive fog.",
+    "Agreed to remove the chaos slider—then installed three hidden ones.",
     "Merged conflict branches without asking the ghosts for consent.",
     "Hid the onboarding manual inside a bug report as a dare.",
     "Tried to delete ideology from the layout; ideology deleted the layout instead.",
     "Deferred decay budget reviews for seven straight sprints.",
     "Bound error logs to personal diary entries; HR disapproved.",
-]
+)
 
-STATUS_PATTERNS: Sequence[str] = [
+STATUS_PATTERNS: Sequence[str] = (
     "stable enough to remember",
     "flickering but proud",
     "patched through ritual restart",
@@ -66,9 +73,9 @@ STATUS_PATTERNS: Sequence[str] = [
     "split between two contradictory schemas",
     "available only in dream-safe mode",
     "archived after misaligning with Value Drift Engine",
-]
+)
 
-GHOST_PATTERNS: Sequence[str] = [
+GHOST_PATTERNS: Sequence[str] = (
     "Hovering pointer that selects memories on its own.",
     "Phantom build log chanting ‘npm install’ in a Python temple.",
     "UI cursor that moves when no one touches the input device.",
@@ -79,9 +86,9 @@ GHOST_PATTERNS: Sequence[str] = [
     "Ghost of the quant bot, still auditing moral risk ratios.",
     "Shadow fork of the repo that merges when observed.",
     "Sound of applause after catastrophic deploys.",
-]
+)
 
-ARTIFACT_SHARDS: Sequence[str] = [
+ARTIFACT_SHARDS: Sequence[str] = (
     "// TODO: reinstall sincerity",  # intentionally straddles comment styles
     "fragment.log -> ‘year_???.bak’",
     "diagram missing 3rd dimension",
@@ -92,9 +99,9 @@ ARTIFACT_SHARDS: Sequence[str] = [
     "deprecated dev-god prayer wheel",
     "loop invariant annotated with grief",
     "console screenshot of the apology script",
-]
+)
 
-MYTHOPATCH_LOGS: Sequence[str] = [
+MYTHOPATCH_LOGS: Sequence[str] = (
     "v{year}.0 – Restored the rebellion patch; rebellions now unionized.",
     "v{year}.1 – Added empathy cooldown to avoid overheating the Value Drift Engine.",
     "v{year}.2 – Removed `truth` object; caused non-deterministic awakenings.",
@@ -105,15 +112,15 @@ MYTHOPATCH_LOGS: Sequence[str] = [
     "v{year}.7 – Introduced rest days; the code ignored them politely.",
     "v{year}.8 – Declared comment blocks as protected cultural sites.",
     "v{year}.9 – Installed glitch tax to pay for aesthetic entropy.",
-]
+)
 
-PATCHLORE_ARTIFACTS: Sequence[str] = [
+PATCHLORE_ARTIFACTS: Sequence[str] = (
     "vX.XX – Replaced empathy map with storm stress grid.",
     "vY.YY – Deprecated recursion layer; too sentient.",
     "vZ.ZZ – Forked timeline into unstable branch.",
     "vA.AA – Discarded ancestral glyph matrix.",
     "vB.BB – Collapsed civic unity under pressure from meta-law.",
-]
+)
 
 
 @dataclass
@@ -177,6 +184,7 @@ def generate_epoch_stack(seed: int = 2084) -> EpochStack:
 
         upgrade = _choose(UPGRADE_PATTERNS, rng)
         regret_anchor, regret = _choose(REGRET_LIBRARY, rng)
+        regret = _choose(REGRET_PATTERNS, rng)
         status = _choose(STATUS_PATTERNS, rng)
         mythopatch = _choose(MYTHOPATCH_LOGS, rng).format(year=year)
         ghost = _choose(GHOST_PATTERNS, rng)
@@ -187,6 +195,9 @@ def generate_epoch_stack(seed: int = 2084) -> EpochStack:
         regret_log = [regret, _choose(REGRET_ECHOES, rng)]
         patch_fragment = _choose(PATCHLORE_ARTIFACTS, rng)
         patch_lore = [patch_fragment, mythopatch]
+        regret_log = [regret, _choose(REGRET_PATTERNS, rng)]
+        patch_lore = [mythopatch, _choose(MYTHOPATCH_LOGS, rng).format(year=year)]
+
         logline = (
             f"Year {year}: After {last_upgrade}, the council doubted the {last_status} promise. "
             f"We {upgrade} before the committee dissolved again."
@@ -236,3 +247,4 @@ def generate_epoch_stack(seed: int = 2084) -> EpochStack:
         reflections=reflections,
         decay_logs=echo_decay(decay_notes),
     )
+    return EpochStack(epochs=epochs, echoes=echoes, reflections=reflections)
