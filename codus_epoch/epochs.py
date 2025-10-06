@@ -5,6 +5,8 @@ from dataclasses import dataclass, field
 from typing import Iterable, List, Sequence
 import random
 
+from .glitch import GlitchArtifact, echo_decay, inject_glitch, spawn_artifact
+
 
 DEV_GODS = [
     "Seren of the First Draft",
@@ -112,6 +114,10 @@ class Epoch:
     mythopatch: str
     ghost: str
     artifacts: List[str] = field(default_factory=list)
+    glitch_trace: str = ""
+    glitch_banner: GlitchArtifact | None = None
+    regret_log: List[str] = field(default_factory=list)
+    patch_lore: List[str] = field(default_factory=list)
 
     @property
     def label(self) -> str:
@@ -125,6 +131,7 @@ class EpochStack:
     epochs: List[Epoch]
     echoes: List[str]
     reflections: List[str]
+    decay_logs: List[str]
 
     def __iter__(self) -> Iterable[Epoch]:
         return iter(self.epochs)
@@ -141,6 +148,7 @@ def generate_epoch_stack(seed: int = 2084) -> EpochStack:
     epochs: List[Epoch] = []
     echoes: List[str] = []
     reflections: List[str] = []
+    decay_notes: List[str] = []
 
     last_upgrade = "sketched the impossible roadmap in ash"
     last_status = "half-compiled"
@@ -157,10 +165,18 @@ def generate_epoch_stack(seed: int = 2084) -> EpochStack:
 
         # rotate artifact shards to ensure layered feel
         artifacts = [rng.choice(ARTIFACT_SHARDS) for _ in range(3)]
+        glitch_banner = spawn_artifact(year, rng)
+        regret_log = [regret, _choose(REGRET_PATTERNS, rng)]
+        patch_lore = [mythopatch, _choose(MYTHOPATCH_LOGS, rng).format(year=year)]
 
         logline = (
             f"Year {year}: After {last_upgrade}, the council doubted the {last_status} promise. "
             f"We {upgrade} before the committee dissolved again."
+        )
+        glitch_trace = inject_glitch(
+            logline,
+            rng,
+            intensity=0.18 if year > 70 else 0.1,
         )
 
         epoch = Epoch(
@@ -174,6 +190,10 @@ def generate_epoch_stack(seed: int = 2084) -> EpochStack:
             mythopatch=mythopatch,
             ghost=ghost,
             artifacts=artifacts,
+            glitch_trace=glitch_trace,
+            glitch_banner=glitch_banner,
+            regret_log=regret_log,
+            patch_lore=patch_lore,
         )
         epochs.append(epoch)
 
@@ -183,8 +203,17 @@ def generate_epoch_stack(seed: int = 2084) -> EpochStack:
         reflections.append(
             f"Reflection {year:02d}: {regret} We archived the fragment beneath a {ghost.lower()}"
         )
+        decay_notes.append(
+            f"Decay {year:02d}: {glitch_banner.annotation} ({glitch_banner.glyphs})."
+        )
 
         last_upgrade = upgrade
         last_status = status
 
+    return EpochStack(
+        epochs=epochs,
+        echoes=echoes,
+        reflections=reflections,
+        decay_logs=echo_decay(decay_notes),
+    )
     return EpochStack(epochs=epochs, echoes=echoes, reflections=reflections)

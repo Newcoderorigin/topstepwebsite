@@ -8,6 +8,8 @@ type EpochRecord = {
   year: number;
   phase: Phase;
   motif: string;
+  decade: number;
+  eraTitle: string;
   logline: string;
   upgrade: string;
   regret: string;
@@ -16,6 +18,10 @@ type EpochRecord = {
   devNote: string;
   valueDrift: string;
   abandoned: string;
+  echo: string;
+  memory: string;
+  status: string;
+  glitch: string;
   devGod?: string;
   decay: number;
 };
@@ -25,6 +31,199 @@ type PerceptionMode = {
   name: string;
   description: string;
   highlight: (epoch: EpochRecord) => boolean;
+};
+
+const motifs = [
+  'amber-grid',
+  'cobalt-lattice',
+  'echo-slab',
+  'ritual-terminal',
+  'spiral ledger',
+  'silent ticker',
+  'contrarian kiosk',
+  'mycelial loom',
+  'glacial marquee',
+  'ashen observatory',
+  'ultraviolet causeway',
+  'memory kiln'
+];
+
+const devGods = [
+  'Ada Flux',
+  'Mir Qadir',
+  'Iris Halver',
+  'Thorne-7',
+  'Ophel Tal',
+  'Noctis Vale',
+  'Sloane Verge',
+  'Ansel Paradox',
+  'Rune Meridian',
+  'Calder Venn'
+];
+
+const decisionFragments = [
+  'echoed {prevUpgrade} while rewriting the {motif} bones by hand.',
+  'rediscovered the {prevMotif} walkway and coaxed ΣA to breathe inside it.',
+  'refused commercialization; sculpted a {motif} reliquary of intentions.',
+  'argued with {devGod} about menus; left half of them commented out in mourning.',
+  'folded {prevYear} inside Year {year} hoping recursion could heal the cracks.',
+  'borrowed the broken playbooks and stored them in a {motif} mausoleum.',
+  'consulted the Interference Ghost and inverted the {prevMotif} navigation tree.',
+  'let the timeline stream idle; watched ΣA frost over the {motif} floor.',
+  'replaced metrics with myth and forged {motif} sigils for each ideology.',
+  'attempted to silence the Value Drift Engine by teaching it {motif} poetry.'
+];
+
+const upgradeFragments = [
+  'Micro-upgrade: {motif} viewport only renders when ΣA twilight is respected.',
+  'Micro-upgrade: installed a recursive cursor that retraces {prevYear} with reluctant grace.',
+  'Micro-upgrade: {motif} archive now hums a three-note mantra to repel profit logic.',
+  'Micro-upgrade: menus bend around {devGod}\'s annotations, preserving every contradiction.',
+  'Micro-upgrade: {motif} ledger emits faint whispers documenting abandoned economies.',
+  'Micro-upgrade: ritual slider loops {prevMotif} color palettes until they fracture.',
+  'Micro-upgrade: added {motif} overlay exposing the Value Drift Engine\'s wandering focus.',
+  'Micro-upgrade: {motif} console paints ghost tooltips to honor ΣD interference.',
+  'Micro-upgrade: patched in a {motif} anamnesis filter that replays failed releases.',
+  'Micro-upgrade: {motif} gate keeps player agency symbolic, perception-only as law.'
+];
+
+const regretFragments = [
+  'Regret: left the {prevMotif} heuristics uncommented; they whisper contradictory tooltips.',
+  'Regret: sealed {prevYear} diagrams beneath glass; nobody can edit the prophecy now.',
+  'Regret: swapped tactile stats for myth; traders nod but do not understand.',
+  'Regret: promised {devGod} a stable dashboard, delivered another shrine instead.',
+  'Regret: forgot to archive the laughter from {prevYear}; ghosts complain nightly.',
+  'Regret: duplicated the {motif} stack, ensuring future archaeologists argue forever.',
+  'Regret: Value Drift Engine keeps mistaking empathy for latency.',
+  'Regret: let ΣD annotate the changelog with jokes no one can decode.',
+  'Regret: documented the truth in {motif} ink; it ran under simulated rain.',
+  'Regret: never deleted the redundant tutorial; it metastasized into legend.'
+];
+
+const artifactFragments = [
+  'Artifact archived: {motif} patchboard sealed behind cracked glass. ΣD interference permitted.',
+  'Artifact archived: {prevYear} UI duplicated and left as fossil HTML in a hidden div.',
+  'Artifact archived: {motif} sketch burned onto acetate, edges looping in fractal decay.',
+  'Artifact archived: command palette split, one half chanting \"TODO\" forever.',
+  'Artifact archived: rogue {motif} cursor preserved in amber, still looking for context.',
+  'Artifact archived: {devGod} signature compiled into the CSS, commented yet unavoidable.',
+  'Artifact archived: Value Drift Engine telemetry pinned to a corkboard of lost intents.',
+  'Artifact archived: {motif} layout saved as .psd, never exported, referenced by myth only.',
+  'Artifact archived: ΣE ledger stored in localStorage, flagged as \"do not trust\".',
+  'Artifact archived: {motif} timeline captured mid-desync; keep the stutter as memory.'
+];
+
+const mythoPatchFragments = [
+  'ΣB patch v{year}.γ – Removed the concept of victory; it kept generating markets.',
+  'ΣB patch v{year}.δ – Bound the Value Drift Engine to {motif}; expect polite rebellion.',
+  'ΣB patch v{year}.ε – Reintroduced {prevMotif} tooltips as folklore rather than fact.',
+  'ΣB patch v{year}.ζ – Archived {prevYear} metrics; replaced them with devotional margins.',
+  'ΣB patch v{year}.η – Allowed ΣD ghosts to annotate onboarding with warnings.',
+  'ΣB patch v{year}.θ – Traded the risk dial for a ceremonial hourglass of latency.',
+  'ΣB patch v{year}.ι – Merged prototyping and mourning into a single settings tab.',
+  'ΣB patch v{year}.κ – Disabled profit triggers; left gratitude toggles intact.',
+  'ΣB patch v{year}.λ – Added {motif} footnotes describing why the sim refuses to be a game.',
+  'ΣB patch v{year}.μ – Licensed contradictions so they render as shimmering artifacts.'
+];
+
+const devNoteFragments = [
+  '// ΣF memo Year {year}: {motif} interface passes introspection; release withheld.',
+  '/* TODO Year {year}: ask {devGod} why the terminal hums in unanswered questions. */',
+  '// Developer note: {prevYear} hotfix kept alive out of respect for ΣD ghosts.',
+  '// Year {year} diary: Value Drift Engine demanded poetry, received spreadsheets instead.',
+  '// Hidden comment: if {motif} ever stabilizes, reboot the whole epoch stack.',
+  '/* ΣF whisper Year {year}: remember Echo Before Build. We never start, we recall. */',
+  '// TODO?? Year {year}: fold the timeline into origami; see if the market still breathes.',
+  '// Year {year} – leaving this blank. Absence is also an artifact.',
+  '/* Year {year} patch: {prevMotif} shader leaks lumens. Keep it; the leak teaches. */',
+  '// ΣF backlog Year {year}: translate {motif} notation for the next immortal.'
+];
+
+const valueDriftFragments = [
+  'ΣE drift report: {phase} ideals now 37% nostalgia, 63% unresolved intent.',
+  'ΣE drift report: recalibrated ethics into UI spacing; tolerance ±{year}σ px.',
+  'ΣE drift report: Value Drift Engine mislabels compassion as latency spikes again.',
+  'ΣE drift report: {motif} schema holding but the purpose keeps migrating.',
+  'ΣE drift report: ambition recoded into tooltips; still no consensus on meaning.',
+  'ΣE drift report: {prevYear} rationale archived, but ghosts rehydrate it nightly.',
+  'ΣE drift report: timeline loops three frames behind, intentionally.',
+  'ΣE drift report: profit logic quarantined; ideology grows luminous moss.',
+  'ΣE drift report: {devGod} demanded a break; automation delivered lullabies.',
+  'ΣE drift report: {motif} resonance stable; audience perception unstable. Perfect.'
+];
+
+const abandonedFragments = [
+  'Abandoned Feature: {motif} marketplace scrapped after ideology audit meltdown.',
+  'Abandoned Feature: {prevYear} analytics disabled; truth caused paradox loops.',
+  'Abandoned Feature: ΣD recommended victory screen; vetoed for being too finite.',
+  'Abandoned Feature: {motif} onboarding corridors collapsed to preserve mystery.',
+  'Abandoned Feature: planned tutorial replaced with a shrine of unanswered tickets.',
+  'Abandoned Feature: {devGod} requested weather system; replaced with whispers.',
+  'Abandoned Feature: {motif} scoreboard replaced by oral history timeline.',
+  'Abandoned Feature: automation of empathy paused pending Value Drift approval.',
+  'Abandoned Feature: {motif} profit switch welded to \"OFF\" for eternity.',
+  'Abandoned Feature: Year {year} patch for productivity withheld; chaos preserved.'
+];
+
+const echoFragments = [
+  'Echo log: {prevYear} blueprints replay in {motif} glass; nothing aligns but the intent.',
+  'Echo log: inverted {prevMotif} schema until the loops surrendered and became ritual.',
+  'Echo log: archived {prevYear} remorse inside the {motif} nav tree; users feel it in the scroll.',
+  'Echo log: {devGod} whispered "ship"; we remembered to document our hesitation instead.',
+  'Echo log: ΣD ghosts annotated {motif} margins with arguments from Year {prevYear}.',
+  'Echo log: value drift measured in sighs per minute; {motif} panes record each breath.',
+  'Echo log: resurrected a deprecated hotfix and sewed it into {motif} overlays by hand.',
+  'Echo log: {prevMotif} prototypes hum beneath the CSS; do not mute them.',
+  'Echo log: {motif} corridor now stores rejections like constellations of pending merges.',
+  'Echo log: {devGod} refused to delete the TODOs; they stage a sit-in along the gutters.'
+];
+
+const memoryFragments = [
+  'Memory shard: {phase} ideals drafted in pencil, smudged by midnight rebuilds.',
+  'Memory shard: {motif} colors sampled from old commit messages about mercy.',
+  'Memory shard: we pinned {prevYear} tickets to corkboard UI; patrons call it museum logic.',
+  'Memory shard: ΣA recorded our doubt and saved it as animation easing curves.',
+  'Memory shard: {motif} layout still references the market we swore to forget.',
+  'Memory shard: {phase} dashboards printed on acetate for meetings that never occurred.',
+  'Memory shard: {prevMotif} backlog collapsed into footnotes visible only on hover.',
+  'Memory shard: the Value Drift Engine keeps a diary inside the tooltip microcopy.',
+  'Memory shard: {devGod} archived our laughter; it echoes as gradient noise.',
+  'Memory shard: our QA rituals now live in {motif} corners, dusty but devout.'
+];
+
+const statusFragments = [
+  'Status: ideology brittle, UI luminous, shipping window closed but logged.',
+  'Status: recursion stable; morale oscillates between manifesto and maintenance.',
+  'Status: Value Drift Engine negotiating terms with copywriters posing as historians.',
+  'Status: {phase} scaffolding passes accessibility but fails consensus.',
+  'Status: ΣF registry awaiting signatures; everyone is simultaneously late and early.',
+  'Status: {motif} telemetry flagged empathy as spam again; we let it stay.',
+  'Status: backlog frozen under amber; stand-ups replaced with reflective silence.',
+  'Status: {prevYear} regression accepted as canon; patch deferred to posterity.',
+  'Status: spectral QA approved; mortal QA still drafting acceptance criteria.',
+  'Status: release candidate dissolving into ritual; proceed with reverence.'
+];
+
+const glitchFragments = [
+  'Glitch note: parallax jitter introduced to honor fractures; do not remedy.',
+  'Glitch note: {motif} gradient bleeds; traced to Year {prevYear} compromise.',
+  'Glitch note: Dev console mutters about lost env vars. Leave the muttering be.',
+  'Glitch note: ΣA static overlays return each dusk; we call it the twilight build.',
+  'Glitch note: tooltip latency synced with heartbeats from forgotten testers.',
+  'Glitch note: {devGod} re-enabled race condition for storytelling texture.',
+  'Glitch note: {prevMotif} grid occasionally mirrors upside-down. Artifact, not bug.',
+  'Glitch note: fonts desaturate after midnight deploys, per policy.',
+  'Glitch note: {motif} overlay flickers when profit logic approaches.',
+  'Glitch note: loglines reorder themselves during retrospectives. Let them.'
+];
+
+const eraTitles: Record<Phase, string> = {
+  proto: 'Proto-Intent Drafts',
+  ascension: 'Ideological Infrastructure',
+  overclock: 'Optimization Schisms',
+  decay: 'Curated Collapse'
+};
+
 };
 
 const motifs = [
@@ -191,6 +390,7 @@ function generateEpochs(): EpochRecord[] {
     const motif = motifs[(i + Math.floor(year / 5)) % motifs.length];
     const devGod = year % 10 === 0 ? devGods[(year / 10 - 1) % devGods.length] : undefined;
     const prev = records[i - 1];
+    const decade = Math.ceil(year / 10);
 
     const context = {
       motif,
@@ -208,6 +408,8 @@ function generateEpochs(): EpochRecord[] {
       year,
       phase,
       motif,
+      decade,
+      eraTitle: eraTitles[phase],
       logline: `Year ${year}: ${fill(decisionFragments[(i + 3) % decisionFragments.length], context)}`,
       upgrade: fill(upgradeFragments[(i + 4) % upgradeFragments.length], context),
       regret: fill(regretFragments[(i + 5) % regretFragments.length], context),
@@ -216,6 +418,10 @@ function generateEpochs(): EpochRecord[] {
       devNote: fill(devNoteFragments[(i + 2) % devNoteFragments.length], context),
       valueDrift: fill(valueDriftFragments[(i + 8) % valueDriftFragments.length], context),
       abandoned: fill(abandonedFragments[(i + 1) % abandonedFragments.length], context),
+      echo: fill(echoFragments[(i + decade) % echoFragments.length], context),
+      memory: fill(memoryFragments[(i + 9) % memoryFragments.length], context),
+      status: fill(statusFragments[(i + 2 * decade) % statusFragments.length], context),
+      glitch: fill(glitchFragments[(i + 5) % glitchFragments.length], context),
       devGod,
       decay
     });
@@ -325,6 +531,15 @@ function App() {
               <span>Year: {selectedEpoch.year}</span>
             </div>
             <div className="codex-terminal__body">
+              <p className="terminal-line">{selectedEpoch.logline}</p>
+              <p className="terminal-line">{selectedEpoch.mythoPatch}</p>
+              <p className="terminal-line">{selectedEpoch.valueDrift}</p>
+              <p className="terminal-line">{selectedEpoch.echo}</p>
+              <p className="terminal-line">{selectedEpoch.memory}</p>
+              <p className="terminal-line">{selectedEpoch.status}</p>
+              <p className="terminal-line">{selectedEpoch.glitch}</p>
+              <p className="terminal-line">{selectedEpoch.devNote}</p>
+              <p className="terminal-line">{selectedEpoch.abandoned}</p>
               <p>{selectedEpoch.logline}</p>
               <p>{selectedEpoch.mythoPatch}</p>
               <p>{selectedEpoch.valueDrift}</p>
@@ -334,6 +549,27 @@ function App() {
             <div className="codex-terminal__footer">
               DevGod Registry ΣF: {selectedEpoch.devGod ?? 'Unclaimed cycle — ghosts negotiating.'}
             </div>
+          </div>
+        </aside>
+
+        <section className="epoch-stack" aria-label="Century of recursive design epochs">
+          <div className="decade-strata" aria-label="Decade stratigraphy">
+            {decadeSummaries.map((band) => (
+              <article key={band.decade} className="decade-card">
+                <header className="decade-card__header">
+                  <span className="decade-label">{band.label}</span>
+                  <span className="decade-span">{band.span}</span>
+                </header>
+                <div className="decade-body">
+                  <p className="decade-era">{band.anchor.eraTitle}</p>
+                  <p className="decade-summary">{band.summary}</p>
+                  <p className="decade-haunt">{band.haunt}</p>
+                  <p className="decade-anchor">Anchor Year: {band.anchor.year}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+
           </div>
         </aside>
 
@@ -360,6 +596,7 @@ function App() {
                   </div>
                   <span className="epoch-phase">{epoch.phase}</span>
                 </header>
+                <p className="epoch-era">{epoch.eraTitle}</p>
                 <p className="epoch-logline">{epoch.logline}</p>
                 <div className="epoch-field">
                   <span className="label">Micro-upgrade</span>
@@ -384,6 +621,22 @@ function App() {
                 <div className="epoch-field">
                   <span className="label">Abandoned Feature</span>
                   <span className="value">{epoch.abandoned}</span>
+                </div>
+                <div className="epoch-field">
+                  <span className="label">Echo</span>
+                  <span className="value">{epoch.echo}</span>
+                </div>
+                <div className="epoch-field">
+                  <span className="label">Memory</span>
+                  <span className="value">{epoch.memory}</span>
+                </div>
+                <div className="epoch-field">
+                  <span className="label">Status</span>
+                  <span className="value">{epoch.status}</span>
+                </div>
+                <div className="epoch-field">
+                  <span className="label">Glitch</span>
+                  <span className="value">{epoch.glitch}</span>
                 </div>
                 <p className="epoch-devnote">{epoch.devNote}</p>
                 {epoch.devGod && <p className="dev-god">DevGod ΣF Tribute: {epoch.devGod}</p>}

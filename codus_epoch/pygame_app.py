@@ -53,6 +53,7 @@ class EpochViewer:
         self.font_large = pygame.font.SysFont("IBM Plex Mono", 26)
         self.font_medium = pygame.font.SysFont("IBM Plex Mono", 20)
         self.font_small = pygame.font.SysFont("IBM Plex Mono", 16)
+        self.font_glitch = pygame.font.SysFont("IBM Plex Mono", 14)
         self.glitch_seed = 0.0
 
     def run(self) -> None:
@@ -116,6 +117,7 @@ class EpochViewer:
 
     def _draw_header(self) -> None:
         title = "CODUS-EPOCH: 100 YEARS OF UNFINISHED MEMORY"
+        subtitle = "Arrow keys / mouse wheel to navigate. Mythopatch & decay bands annotate ideological drift."
         subtitle = "Arrow keys / mouse wheel to navigate. Mythopatch logs preserve ideological drift."
         overlay = pygame.Surface((WIDTH, HEADER_HEIGHT), pygame.SRCALPHA)
         overlay.fill((10, 8, 16, 210))
@@ -188,6 +190,17 @@ class EpochViewer:
         for i, line in enumerate(logline_lines[:2]):
             self.screen.blit(self.font_small.render(line, True, PALETTE.text_secondary), (text_x, y + 32 + i * 18))
 
+        glitch_lines = self._wrap_text(epoch.glitch_trace, self.font_glitch, card_rect.width - 32)
+        if glitch_lines:
+            glitch_color = self._fade_color(PALETTE.glyph, min(1.0, decay + 0.2))
+            self.screen.blit(self.font_glitch.render(glitch_lines[0], True, glitch_color), (text_x, y + card_height - 46))
+
+        if epoch.patch_lore:
+            myth = self.font_small.render(epoch.patch_lore[0], True, PALETTE.glyph)
+            self.screen.blit(myth, (text_x, y + card_height - 28))
+        if len(epoch.patch_lore) > 1:
+            myth_echo = self.font_small.render(epoch.patch_lore[1], True, self._fade_color(PALETTE.glyph, 0.6))
+            self.screen.blit(myth_echo, (text_x, y + card_height - 14))
         myth = self.font_small.render(epoch.mythopatch, True, PALETTE.glyph)
         self.screen.blit(myth, (text_x, y + card_height - 22))
 
@@ -199,6 +212,19 @@ class EpochViewer:
             self.screen.blit(glyph_surface, (card_rect.right - 80, glyph_y))
             glyph_y += 16
 
+        if epoch.glitch_banner:
+            banner_surface = self.font_small.render(epoch.glitch_banner.banner, True, PALETTE.text_primary)
+            banner_rect = banner_surface.get_rect()
+            banner_rect.topright = (card_rect.right - 8, y - 18)
+            self.screen.blit(banner_surface, banner_rect)
+            glyph_surface = self.font_small.render(epoch.glitch_banner.glyphs, True, self._fade_color(PALETTE.accent, 0.3))
+            glyph_rect = glyph_surface.get_rect()
+            glyph_rect.topright = (card_rect.right - 8, y - 36)
+            self.screen.blit(glyph_surface, glyph_rect)
+            if epoch.regret_log:
+                regret_text = self.font_glitch.render(epoch.regret_log[0], True, self._fade_color(PALETTE.text_secondary, decay))
+                self.screen.blit(regret_text, (text_x, y + card_height - 62))
+
     def _draw_reflection_strip(self) -> None:
         strip_height = 90
         strip_rect = pygame.Rect(0, HEIGHT - strip_height, WIDTH, strip_height)
@@ -209,6 +235,13 @@ class EpochViewer:
         index = int((self.offset / LINE_HEIGHT) % len(self.stack.reflections))
         reflection = self.stack.reflections[index]
         echo = self.stack.echoes[index]
+        decay = self.stack.decay_logs[index]
+        self.screen.blit(self.font_small.render(reflection, True, PALETTE.text_primary), (MARGIN, HEIGHT - strip_height + 16))
+        self.screen.blit(self.font_small.render(echo, True, PALETTE.text_secondary), (MARGIN, HEIGHT - strip_height + 44))
+        self.screen.blit(self.font_small.render(decay, True, self._fade_color(PALETTE.glyph, 0.3)), (MARGIN, HEIGHT - strip_height + 60))
+
+        hint = "Hold Q or ESC to exit. HOME/END to jump across the century."
+        self.screen.blit(self.font_small.render(hint, True, PALETTE.faded), (MARGIN, HEIGHT - strip_height + 76))
         self.screen.blit(self.font_small.render(reflection, True, PALETTE.text_primary), (MARGIN, HEIGHT - strip_height + 16))
         self.screen.blit(self.font_small.render(echo, True, PALETTE.text_secondary), (MARGIN, HEIGHT - strip_height + 44))
 
