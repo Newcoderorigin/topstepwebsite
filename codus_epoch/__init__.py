@@ -9,5 +9,6 @@ def launch(seed: int = 2084) -> None:
 
     _launch(seed=seed)
 
+from .pygame_app import launch
 
 __all__ = ["Epoch", "EpochStack", "generate_epoch_stack", "launch"]
