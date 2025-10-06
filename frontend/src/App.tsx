@@ -224,6 +224,140 @@ const eraTitles: Record<Phase, string> = {
   decay: 'Curated Collapse'
 };
 
+};
+
+const motifs = [
+  'amber-grid',
+  'cobalt-lattice',
+  'echo-slab',
+  'ritual-terminal',
+  'spiral ledger',
+  'silent ticker',
+  'contrarian kiosk',
+  'mycelial loom',
+  'glacial marquee',
+  'ashen observatory',
+  'ultraviolet causeway',
+  'memory kiln'
+];
+
+const devGods = [
+  'Ada Flux',
+  'Mir Qadir',
+  'Iris Halver',
+  'Thorne-7',
+  'Ophel Tal',
+  'Noctis Vale',
+  'Sloane Verge',
+  'Ansel Paradox',
+  'Rune Meridian',
+  'Calder Venn'
+];
+
+const decisionFragments = [
+  'echoed {prevUpgrade} while rewriting the {motif} bones by hand.',
+  'rediscovered the {prevMotif} walkway and coaxed ΣA to breathe inside it.',
+  'refused commercialization; sculpted a {motif} reliquary of intentions.',
+  'argued with {devGod} about menus; left half of them commented out in mourning.',
+  'folded {prevYear} inside Year {year} hoping recursion could heal the cracks.',
+  'borrowed the broken playbooks and stored them in a {motif} mausoleum.',
+  'consulted the Interference Ghost and inverted the {prevMotif} navigation tree.',
+  'let the timeline stream idle; watched ΣA frost over the {motif} floor.',
+  'replaced metrics with myth and forged {motif} sigils for each ideology.',
+  'attempted to silence the Value Drift Engine by teaching it {motif} poetry.'
+];
+
+const upgradeFragments = [
+  'Micro-upgrade: {motif} viewport only renders when ΣA twilight is respected.',
+  'Micro-upgrade: installed a recursive cursor that retraces {prevYear} with reluctant grace.',
+  'Micro-upgrade: {motif} archive now hums a three-note mantra to repel profit logic.',
+  'Micro-upgrade: menus bend around {devGod}\'s annotations, preserving every contradiction.',
+  'Micro-upgrade: {motif} ledger emits faint whispers documenting abandoned economies.',
+  'Micro-upgrade: ritual slider loops {prevMotif} color palettes until they fracture.',
+  'Micro-upgrade: added {motif} overlay exposing the Value Drift Engine\'s wandering focus.',
+  'Micro-upgrade: {motif} console paints ghost tooltips to honor ΣD interference.',
+  'Micro-upgrade: patched in a {motif} anamnesis filter that replays failed releases.',
+  'Micro-upgrade: {motif} gate keeps player agency symbolic, perception-only as law.'
+];
+
+const regretFragments = [
+  'Regret: left the {prevMotif} heuristics uncommented; they whisper contradictory tooltips.',
+  'Regret: sealed {prevYear} diagrams beneath glass; nobody can edit the prophecy now.',
+  'Regret: swapped tactile stats for myth; traders nod but do not understand.',
+  'Regret: promised {devGod} a stable dashboard, delivered another shrine instead.',
+  'Regret: forgot to archive the laughter from {prevYear}; ghosts complain nightly.',
+  'Regret: duplicated the {motif} stack, ensuring future archaeologists argue forever.',
+  'Regret: Value Drift Engine keeps mistaking empathy for latency.',
+  'Regret: let ΣD annotate the changelog with jokes no one can decode.',
+  'Regret: documented the truth in {motif} ink; it ran under simulated rain.',
+  'Regret: never deleted the redundant tutorial; it metastasized into legend.'
+];
+
+const artifactFragments = [
+  'Artifact archived: {motif} patchboard sealed behind cracked glass. ΣD interference permitted.',
+  'Artifact archived: {prevYear} UI duplicated and left as fossil HTML in a hidden div.',
+  'Artifact archived: {motif} sketch burned onto acetate, edges looping in fractal decay.',
+  'Artifact archived: command palette split, one half chanting \"TODO\" forever.',
+  'Artifact archived: rogue {motif} cursor preserved in amber, still looking for context.',
+  'Artifact archived: {devGod} signature compiled into the CSS, commented yet unavoidable.',
+  'Artifact archived: Value Drift Engine telemetry pinned to a corkboard of lost intents.',
+  'Artifact archived: {motif} layout saved as .psd, never exported, referenced by myth only.',
+  'Artifact archived: ΣE ledger stored in localStorage, flagged as \"do not trust\".',
+  'Artifact archived: {motif} timeline captured mid-desync; keep the stutter as memory.'
+];
+
+const mythoPatchFragments = [
+  'ΣB patch v{year}.γ – Removed the concept of victory; it kept generating markets.',
+  'ΣB patch v{year}.δ – Bound the Value Drift Engine to {motif}; expect polite rebellion.',
+  'ΣB patch v{year}.ε – Reintroduced {prevMotif} tooltips as folklore rather than fact.',
+  'ΣB patch v{year}.ζ – Archived {prevYear} metrics; replaced them with devotional margins.',
+  'ΣB patch v{year}.η – Allowed ΣD ghosts to annotate onboarding with warnings.',
+  'ΣB patch v{year}.θ – Traded the risk dial for a ceremonial hourglass of latency.',
+  'ΣB patch v{year}.ι – Merged prototyping and mourning into a single settings tab.',
+  'ΣB patch v{year}.κ – Disabled profit triggers; left gratitude toggles intact.',
+  'ΣB patch v{year}.λ – Added {motif} footnotes describing why the sim refuses to be a game.',
+  'ΣB patch v{year}.μ – Licensed contradictions so they render as shimmering artifacts.'
+];
+
+const devNoteFragments = [
+  '// ΣF memo Year {year}: {motif} interface passes introspection; release withheld.',
+  '/* TODO Year {year}: ask {devGod} why the terminal hums in unanswered questions. */',
+  '// Developer note: {prevYear} hotfix kept alive out of respect for ΣD ghosts.',
+  '// Year {year} diary: Value Drift Engine demanded poetry, received spreadsheets instead.',
+  '// Hidden comment: if {motif} ever stabilizes, reboot the whole epoch stack.',
+  '/* ΣF whisper Year {year}: remember Echo Before Build. We never start, we recall. */',
+  '// TODO?? Year {year}: fold the timeline into origami; see if the market still breathes.',
+  '// Year {year} – leaving this blank. Absence is also an artifact.',
+  '/* Year {year} patch: {prevMotif} shader leaks lumens. Keep it; the leak teaches. */',
+  '// ΣF backlog Year {year}: translate {motif} notation for the next immortal.'
+];
+
+const valueDriftFragments = [
+  'ΣE drift report: {phase} ideals now 37% nostalgia, 63% unresolved intent.',
+  'ΣE drift report: recalibrated ethics into UI spacing; tolerance ±{year}σ px.',
+  'ΣE drift report: Value Drift Engine mislabels compassion as latency spikes again.',
+  'ΣE drift report: {motif} schema holding but the purpose keeps migrating.',
+  'ΣE drift report: ambition recoded into tooltips; still no consensus on meaning.',
+  'ΣE drift report: {prevYear} rationale archived, but ghosts rehydrate it nightly.',
+  'ΣE drift report: timeline loops three frames behind, intentionally.',
+  'ΣE drift report: profit logic quarantined; ideology grows luminous moss.',
+  'ΣE drift report: {devGod} demanded a break; automation delivered lullabies.',
+  'ΣE drift report: {motif} resonance stable; audience perception unstable. Perfect.'
+];
+
+const abandonedFragments = [
+  'Abandoned Feature: {motif} marketplace scrapped after ideology audit meltdown.',
+  'Abandoned Feature: {prevYear} analytics disabled; truth caused paradox loops.',
+  'Abandoned Feature: ΣD recommended victory screen; vetoed for being too finite.',
+  'Abandoned Feature: {motif} onboarding corridors collapsed to preserve mystery.',
+  'Abandoned Feature: planned tutorial replaced with a shrine of unanswered tickets.',
+  'Abandoned Feature: {devGod} requested weather system; replaced with whispers.',
+  'Abandoned Feature: {motif} scoreboard replaced by oral history timeline.',
+  'Abandoned Feature: automation of empathy paused pending Value Drift approval.',
+  'Abandoned Feature: {motif} profit switch welded to \"OFF\" for eternity.',
+  'Abandoned Feature: Year {year} patch for productivity withheld; chaos preserved.'
+];
+
 const perceptionModes: PerceptionMode[] = [
   {
     id: 'archivist',
@@ -406,6 +540,11 @@ function App() {
               <p className="terminal-line">{selectedEpoch.glitch}</p>
               <p className="terminal-line">{selectedEpoch.devNote}</p>
               <p className="terminal-line">{selectedEpoch.abandoned}</p>
+              <p>{selectedEpoch.logline}</p>
+              <p>{selectedEpoch.mythoPatch}</p>
+              <p>{selectedEpoch.valueDrift}</p>
+              <p>{selectedEpoch.devNote}</p>
+              <p>{selectedEpoch.abandoned}</p>
             </div>
             <div className="codex-terminal__footer">
               DevGod Registry ΣF: {selectedEpoch.devGod ?? 'Unclaimed cycle — ghosts negotiating.'}
@@ -431,6 +570,10 @@ function App() {
             ))}
           </div>
 
+          </div>
+        </aside>
+
+        <section className="epoch-stack" aria-label="Century of recursive design epochs">
           {epochs.map((epoch) => {
             const isSelected = epoch.year === selectedYear;
             const perceived = perception.highlight(epoch);

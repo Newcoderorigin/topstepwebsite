@@ -118,6 +118,7 @@ class EpochViewer:
     def _draw_header(self) -> None:
         title = "CODUS-EPOCH: 100 YEARS OF UNFINISHED MEMORY"
         subtitle = "Arrow keys / mouse wheel to navigate. Mythopatch & decay bands annotate ideological drift."
+        subtitle = "Arrow keys / mouse wheel to navigate. Mythopatch logs preserve ideological drift."
         overlay = pygame.Surface((WIDTH, HEADER_HEIGHT), pygame.SRCALPHA)
         overlay.fill((10, 8, 16, 210))
         self.screen.blit(overlay, (0, 0))
@@ -200,6 +201,8 @@ class EpochViewer:
         if len(epoch.patch_lore) > 1:
             myth_echo = self.font_small.render(epoch.patch_lore[1], True, self._fade_color(PALETTE.glyph, 0.6))
             self.screen.blit(myth_echo, (text_x, y + card_height - 14))
+        myth = self.font_small.render(epoch.mythopatch, True, PALETTE.glyph)
+        self.screen.blit(myth, (text_x, y + card_height - 22))
 
         # decorative artifacts as runes along the edge
         glyph_y = y + 10
@@ -239,6 +242,11 @@ class EpochViewer:
 
         hint = "Hold Q or ESC to exit. HOME/END to jump across the century."
         self.screen.blit(self.font_small.render(hint, True, PALETTE.faded), (MARGIN, HEIGHT - strip_height + 76))
+        self.screen.blit(self.font_small.render(reflection, True, PALETTE.text_primary), (MARGIN, HEIGHT - strip_height + 16))
+        self.screen.blit(self.font_small.render(echo, True, PALETTE.text_secondary), (MARGIN, HEIGHT - strip_height + 44))
+
+        hint = "Hold Q or ESC to exit. HOME/END to jump across the century."
+        self.screen.blit(self.font_small.render(hint, True, PALETTE.faded), (MARGIN, HEIGHT - strip_height + 68))
 
     def _draw_footer(self) -> None:
         glitch = math.sin(self.glitch_seed * 2.1)

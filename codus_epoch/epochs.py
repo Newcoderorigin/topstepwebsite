@@ -168,6 +168,7 @@ def generate_epoch_stack(seed: int = 2084) -> EpochStack:
         glitch_banner = spawn_artifact(year, rng)
         regret_log = [regret, _choose(REGRET_PATTERNS, rng)]
         patch_lore = [mythopatch, _choose(MYTHOPATCH_LOGS, rng).format(year=year)]
+
         logline = (
             f"Year {year}: After {last_upgrade}, the council doubted the {last_status} promise. "
             f"We {upgrade} before the committee dissolved again."
@@ -215,3 +216,4 @@ def generate_epoch_stack(seed: int = 2084) -> EpochStack:
         reflections=reflections,
         decay_logs=echo_decay(decay_notes),
     )
+    return EpochStack(epochs=epochs, echoes=echoes, reflections=reflections)
