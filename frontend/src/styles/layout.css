@@ -183,7 +183,7 @@
 .codex-terminal__body {
   padding: 1rem;
   display: grid;
-  gap: 0.5rem;
+  gap: 0.6rem;
   font-size: 0.85rem;
   color: rgba(229, 226, 255, 0.85);
   background: repeating-linear-gradient(
@@ -196,95 +196,11 @@
     linear-gradient(180deg, rgba(9, 12, 24, 0.65), rgba(9, 8, 14, 0.9));
 }
 
-.terminal-line {
-  padding-left: 0.4rem;
-  border-left: 1px solid rgba(119, 221, 255, 0.2);
-}
-
 .epoch-stack {
   display: grid;
   gap: 1.4rem;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   align-content: start;
-}
-
-.decade-strata {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1rem;
-}
-
-.decade-card {
-  position: relative;
-  padding: 1.4rem;
-  border-radius: 20px;
-  border: 1px dashed rgba(255, 255, 255, 0.18);
-  background: rgba(8, 8, 16, 0.6);
-  backdrop-filter: blur(6px);
-  display: grid;
-  gap: 0.8rem;
-  overflow: hidden;
-}
-
-.decade-card::before {
-  content: 'ΣE';
-  position: absolute;
-  top: -1.5rem;
-  right: -0.5rem;
-  font-size: 5rem;
-  color: rgba(255, 255, 255, 0.03);
-  pointer-events: none;
-}
-
-.decade-card__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 1rem;
-  font-size: 0.8rem;
-  letter-spacing: 0.22rem;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
-}
-
-.decade-label {
-  font-weight: 600;
-}
-
-.decade-span {
-  font-size: 0.7rem;
-}
-
-.decade-body {
-  display: grid;
-  gap: 0.45rem;
-  font-size: 0.85rem;
-  color: rgba(225, 223, 255, 0.75);
-}
-
-.decade-era {
-  font-size: 0.75rem;
-  letter-spacing: 0.18rem;
-  text-transform: uppercase;
-  color: rgba(162, 238, 255, 0.7);
-}
-
-.decade-summary {
-  color: rgba(235, 233, 255, 0.85);
-}
-
-.decade-haunt {
-  font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
-    'Courier New', monospace;
-  color: rgba(255, 200, 200, 0.72);
-}
-
-.decade-anchor {
-  font-size: 0.75rem;
-  letter-spacing: 0.12rem;
-  text-transform: uppercase;
-  color: rgba(200, 198, 240, 0.6);
 }
 
 @media (max-width: 768px) {
@@ -409,14 +325,6 @@
   font-size: 0.95rem;
   line-height: 1.4;
   color: rgba(244, 241, 255, 0.85);
-  z-index: 1;
-}
-
-.epoch-era {
-  font-size: 0.75rem;
-  letter-spacing: 0.22rem;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.45);
   z-index: 1;
 }
 
