@@ -1,111 +1,32 @@
-"""Convenience launcher for the TopstepX Command Center services."""
+"""Launcher for the Codus-EPOCH pygame memory simulation."""
+
 from __future__ import annotations
 
 import argparse
-import os
-import shutil
-import signal
-import subprocess
-import sys
-import time
-from pathlib import Path
-from typing import Iterable, List
+from typing import Iterable
 
-PROJECT_ROOT = Path(__file__).resolve().parent
-BACKEND_DIR = PROJECT_ROOT / "backend"
-FRONTEND_DIR = PROJECT_ROOT / "frontend"
+from codus_epoch import launch
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Launch backend, frontend, or both services."
+        description="Run the Codus-EPOCH recursive simulation."
     )
     parser.add_argument(
-        "target",
-        choices=("all", "backend", "frontend"),
-        default="all",
-        nargs="?",
-        help="Service target to launch (default: all).",
+        "--seed",
+        type=int,
+        default=2084,
+        help="Seed controlling the mythological randomization of epochs.",
     )
     return parser
-
-
-def ensure_directories_exist() -> None:
-    for path in (BACKEND_DIR, FRONTEND_DIR):
-        if not path.exists():
-            raise FileNotFoundError(f"Expected directory missing: {path}")
-
-
-def find_npm_executable() -> str:
-    candidates = ["npm"]
-    if os.name == "nt":
-        candidates.insert(0, "npm.cmd")
-
-    for candidate in candidates:
-        path = shutil.which(candidate)
-        if path:
-            return path
-
-    raise RuntimeError(
-        "Unable to locate the npm executable. Install Node.js/npm or update your PATH before launching."
-    )
-
-
-def run_process(command: Iterable[str], cwd: Path) -> subprocess.Popen:
-    env = os.environ.copy()
-    return subprocess.Popen(command, cwd=str(cwd), env=env)
-
-
-def launch_services(target: str) -> List[subprocess.Popen]:
-    ensure_directories_exist()
-
-    npm_executable = find_npm_executable()
-
-    processes: List[subprocess.Popen] = []
-    if target in {"all", "backend"}:
-        processes.append(run_process([npm_executable, "run", "dev"], BACKEND_DIR))
-    if target in {"all", "frontend"}:
-        processes.append(run_process([npm_executable, "run", "dev"], FRONTEND_DIR))
-    return processes
-
-
-def terminate_processes(processes: Iterable[subprocess.Popen]) -> None:
-    for proc in processes:
-        if proc.poll() is None:
-            try:
-                proc.send_signal(signal.SIGINT)
-            except (ProcessLookupError, ValueError):
-                proc.terminate()
-    for proc in processes:
-        try:
-            proc.wait(timeout=5)
-        except subprocess.TimeoutExpired:
-            proc.kill()
 
 
 def main(argv: Iterable[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(list(argv) if argv is not None else None)
-
-    try:
-        processes = launch_services(args.target)
-    except RuntimeError as exc:
-        print(str(exc), file=sys.stderr)
-        return 1
-    if not processes:
-        parser.error("No processes launched")
-    try:
-        while True:
-            for proc in processes:
-                code = proc.poll()
-                if code is not None:
-                    terminate_processes(processes)
-                    return code
-            time.sleep(0.5)
-    except KeyboardInterrupt:
-        terminate_processes(processes)
-        return 0
+    launch(seed=args.seed)
+    return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())
