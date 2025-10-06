@@ -574,6 +574,27 @@ function App() {
         </aside>
 
         <section className="epoch-stack" aria-label="Century of recursive design epochs">
+          <div className="decade-strata" aria-label="Decade stratigraphy">
+            {decadeSummaries.map((band) => (
+              <article key={band.decade} className="decade-card">
+                <header className="decade-card__header">
+                  <span className="decade-label">{band.label}</span>
+                  <span className="decade-span">{band.span}</span>
+                </header>
+                <div className="decade-body">
+                  <p className="decade-era">{band.anchor.eraTitle}</p>
+                  <p className="decade-summary">{band.summary}</p>
+                  <p className="decade-haunt">{band.haunt}</p>
+                  <p className="decade-anchor">Anchor Year: {band.anchor.year}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          </div>
+        </aside>
+
+        <section className="epoch-stack" aria-label="Century of recursive design epochs">
           {epochs.map((epoch) => {
             const isSelected = epoch.year === selectedYear;
             const perceived = perception.highlight(epoch);

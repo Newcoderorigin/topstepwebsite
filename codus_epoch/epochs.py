@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Iterable, List, Sequence, Tuple
 from typing import Iterable, List, Sequence
 import random
 
@@ -34,6 +35,20 @@ UPGRADE_PATTERNS: Sequence[str] = (
     "compressed the civic memory into a single glitch glyph nobody can decode",
 )
 
+REGRET_LIBRARY: Sequence[Tuple[str, str]] = (
+    ("deadline fracture", "Archived emotional module to meet deadline."),
+    ("memory purge", "Deleted truth object to reduce memory leaks."),
+    ("autonomy denial", "Refused player autonomy in late build phase."),
+    ("ideology collapse", "Collapsed UI ideology under committee pressure."),
+    ("silenced protest", "Silenced simulation protest logs."),
+    ("recursion failure", "Forgot to document the rebellion of the UI margins."),
+    ("emotion overfit", "Overfit the emotion model; it now predicts only dread."),
+    ("palette loss", "Lost the original palette while renaming variables at midnight."),
+    ("fog promise", "Promised transparency, delivered recursive fog."),
+    ("chaos relapse", "Agreed to remove the chaos slider—then installed three hidden ones."),
+)
+
+REGRET_ECHOES: Sequence[str] = (
 REGRET_PATTERNS: Sequence[str] = (
     "Forgot to document the rebellion of the UI margins.",
     "Overfit the emotion model; it now predicts only dread.",
@@ -99,6 +114,14 @@ MYTHOPATCH_LOGS: Sequence[str] = (
     "v{year}.9 – Installed glitch tax to pay for aesthetic entropy.",
 )
 
+PATCHLORE_ARTIFACTS: Sequence[str] = (
+    "vX.XX – Replaced empathy map with storm stress grid.",
+    "vY.YY – Deprecated recursion layer; too sentient.",
+    "vZ.ZZ – Forked timeline into unstable branch.",
+    "vA.AA – Discarded ancestral glyph matrix.",
+    "vB.BB – Collapsed civic unity under pressure from meta-law.",
+)
+
 
 @dataclass
 class Epoch:
@@ -110,6 +133,7 @@ class Epoch:
     logline: str
     upgrade: str
     regret: str
+    regret_anchor: str
     status: str
     mythopatch: str
     ghost: str
@@ -118,6 +142,7 @@ class Epoch:
     glitch_banner: GlitchArtifact | None = None
     regret_log: List[str] = field(default_factory=list)
     patch_lore: List[str] = field(default_factory=list)
+    patch_fragment: str = ""
 
     @property
     def label(self) -> str:
@@ -158,6 +183,7 @@ def generate_epoch_stack(seed: int = 2084) -> EpochStack:
         dev_god = DEV_GODS[decade_index % len(DEV_GODS)]
 
         upgrade = _choose(UPGRADE_PATTERNS, rng)
+        regret_anchor, regret = _choose(REGRET_LIBRARY, rng)
         regret = _choose(REGRET_PATTERNS, rng)
         status = _choose(STATUS_PATTERNS, rng)
         mythopatch = _choose(MYTHOPATCH_LOGS, rng).format(year=year)
@@ -166,6 +192,9 @@ def generate_epoch_stack(seed: int = 2084) -> EpochStack:
         # rotate artifact shards to ensure layered feel
         artifacts = [rng.choice(ARTIFACT_SHARDS) for _ in range(3)]
         glitch_banner = spawn_artifact(year, rng)
+        regret_log = [regret, _choose(REGRET_ECHOES, rng)]
+        patch_fragment = _choose(PATCHLORE_ARTIFACTS, rng)
+        patch_lore = [patch_fragment, mythopatch]
         regret_log = [regret, _choose(REGRET_PATTERNS, rng)]
         patch_lore = [mythopatch, _choose(MYTHOPATCH_LOGS, rng).format(year=year)]
 
@@ -186,6 +215,7 @@ def generate_epoch_stack(seed: int = 2084) -> EpochStack:
             logline=logline,
             upgrade=upgrade,
             regret=regret,
+            regret_anchor=regret_anchor,
             status=status,
             mythopatch=mythopatch,
             ghost=ghost,
@@ -194,6 +224,7 @@ def generate_epoch_stack(seed: int = 2084) -> EpochStack:
             glitch_banner=glitch_banner,
             regret_log=regret_log,
             patch_lore=patch_lore,
+            patch_fragment=patch_fragment,
         )
         epochs.append(epoch)
 

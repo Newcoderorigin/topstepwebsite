@@ -12,6 +12,7 @@ from .epochs import Epoch, EpochStack, generate_epoch_stack
 WIDTH, HEIGHT = 1280, 720
 MARGIN = 60
 TIMELINE_X = 180
+LINE_HEIGHT = 110
 LINE_HEIGHT = 72
 CARD_WIDTH = WIDTH - TIMELINE_X - MARGIN
 HEADER_HEIGHT = 140
@@ -55,6 +56,7 @@ class EpochViewer:
         self.font_small = pygame.font.SysFont("IBM Plex Mono", 16)
         self.font_glitch = pygame.font.SysFont("IBM Plex Mono", 14)
         self.glitch_seed = 0.0
+        self.revealed_epochs: set[int] = set()
 
     def run(self) -> None:
         running = True
@@ -92,6 +94,13 @@ class EpochViewer:
                     self.target_offset = len(self.stack.epochs) * LINE_HEIGHT
             if event.type == pygame.MOUSEWHEEL:
                 self.target_offset -= event.y * (LINE_HEIGHT / 2)
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                idx = self._find_epoch_index_at_pos(pygame.mouse.get_pos())
+                if idx is not None:
+                    if idx in self.revealed_epochs:
+                        self.revealed_epochs.remove(idx)
+                    else:
+                        self.revealed_epochs.add(idx)
 
     def _update(self, dt: float) -> None:
         self.offset += (self.target_offset - self.offset) * min(12 * dt, 1)
@@ -107,6 +116,16 @@ class EpochViewer:
         self._draw_footer()
 
     def _draw_background(self) -> None:
+        anchor_color = self._current_anchor_color()
+        for idx, color in enumerate(BACKGROUND_COLORS):
+            rect = pygame.Rect(0, HEIGHT // len(BACKGROUND_COLORS) * idx, WIDTH, HEIGHT // len(BACKGROUND_COLORS) + 1)
+            blended = self._interpolate_color(color, anchor_color, 0.25)
+            pygame.draw.rect(self.screen, blended, rect)
+        # overlay faint noise stripes to hint at decay
+        for i in range(0, WIDTH, 24):
+            mix = i / WIDTH
+            tint = self._interpolate_color(anchor_color, (12, 12, 18), mix * 0.6)
+            shade = (tint[0], tint[1], tint[2])
         for idx, color in enumerate(BACKGROUND_COLORS):
             rect = pygame.Rect(0, HEIGHT // len(BACKGROUND_COLORS) * idx, WIDTH, HEIGHT // len(BACKGROUND_COLORS) + 1)
             pygame.draw.rect(self.screen, color, rect)
@@ -162,6 +181,10 @@ class EpochViewer:
             if card_y < HEADER_HEIGHT - LINE_HEIGHT or card_y > HEIGHT:
                 continue
             decay = idx / max(len(self.stack.epochs) - 1, 1)
+            self._draw_epoch_card(idx, epoch, card_y, decay)
+
+    def _draw_epoch_card(self, idx: int, epoch: Epoch, y: float, decay: float) -> None:
+        card_height = LINE_HEIGHT - 12
             self._draw_epoch_card(epoch, card_y, decay)
 
     def _draw_epoch_card(self, epoch: Epoch, y: float, decay: float) -> None:
@@ -170,6 +193,18 @@ class EpochViewer:
         card_rect = pygame.Rect(TIMELINE_X + 20, y, CARD_WIDTH - 40, card_height)
 
         overlay = pygame.Surface((card_rect.width, card_rect.height), pygame.SRCALPHA)
+        regret_color = self._regret_anchor_color(epoch.regret_anchor)
+        overlay_color = (
+            int(regret_color[0] * 0.6 + 40 * (1 - decay)),
+            int(regret_color[1] * 0.6 + 30 * (1 - decay)),
+            int(regret_color[2] * 0.6 + 50 * (1 - decay)),
+            175,
+        )
+        overlay.fill(overlay_color)
+        self.screen.blit(overlay, card_rect.topleft)
+
+        pygame.draw.rect(self.screen, decay_color, card_rect, 2)
+        glitch_amplitude = math.sin(self.glitch_seed + epoch.year * 0.33) * 2.2
         overlay.fill((int(40 + 120 * (1 - decay)), int(20 + 60 * (1 - decay)), int(60 + 120 * (1 - decay)), 165))
         self.screen.blit(overlay, card_rect.topleft)
 
@@ -186,6 +221,32 @@ class EpochViewer:
         title = f"{epoch.label} // {epoch.status.upper()}"
         self.screen.blit(self.font_medium.render(title, True, PALETTE.text_primary), (text_x, y + 6))
 
+        regret_text = f"Regret: {epoch.regret}"
+        regret_surface = self.font_small.render(regret_text, True, self._fade_color(PALETTE.text_primary, decay * 0.5))
+        self.screen.blit(regret_surface, (text_x, y + 30))
+
+        logline_lines = self._wrap_text(epoch.logline, self.font_small, card_rect.width - 32)
+        for i, line in enumerate(logline_lines[:2]):
+            self.screen.blit(self.font_small.render(line, True, PALETTE.text_secondary), (text_x, y + 52 + i * 18))
+
+        glitch_lines = self._wrap_text(epoch.glitch_trace, self.font_glitch, card_rect.width - 32)
+        if glitch_lines:
+            glitch_color = self._fade_color(PALETTE.glyph, min(1.0, decay + 0.3))
+            self.screen.blit(self.font_glitch.render(glitch_lines[0], True, glitch_color), (text_x, y + card_height - 34))
+
+        mouse_pos = pygame.mouse.get_pos()
+        hovered = card_rect.collidepoint(mouse_pos)
+        revealed = hovered or idx in self.revealed_epochs
+        if revealed and epoch.patch_fragment:
+            fragment_surface = self.font_small.render(f"Patchlore: {epoch.patch_fragment}", True, PALETTE.glyph)
+            self.screen.blit(fragment_surface, (text_x, y + card_height - 54))
+        else:
+            hint_surface = self.font_small.render("Patchlore: hover/click to reveal", True, self._fade_color(PALETTE.text_secondary, 0.4))
+            self.screen.blit(hint_surface, (text_x, y + card_height - 54))
+
+        if len(epoch.patch_lore) > 1 and revealed:
+            myth_echo = self.font_small.render(epoch.patch_lore[1], True, self._fade_color(PALETTE.glyph, 0.6))
+            self.screen.blit(myth_echo, (text_x, y + card_height - 18))
         logline_lines = self._wrap_text(epoch.logline, self.font_small, card_rect.width - 32)
         for i, line in enumerate(logline_lines[:2]):
             self.screen.blit(self.font_small.render(line, True, PALETTE.text_secondary), (text_x, y + 32 + i * 18))
@@ -222,6 +283,8 @@ class EpochViewer:
             glyph_rect.topright = (card_rect.right - 8, y - 36)
             self.screen.blit(glyph_surface, glyph_rect)
             if epoch.regret_log:
+                echo_surface = self.font_glitch.render(epoch.regret_log[1], True, self._fade_color(PALETTE.text_secondary, decay))
+                self.screen.blit(echo_surface, (text_x, y + card_height - 16))
                 regret_text = self.font_glitch.render(epoch.regret_log[0], True, self._fade_color(PALETTE.text_secondary, decay))
                 self.screen.blit(regret_text, (text_x, y + card_height - 62))
 
@@ -283,6 +346,37 @@ class EpochViewer:
 
     def _fade_color(self, color: Tuple[int, int, int], decay: float) -> Tuple[int, int, int]:
         return tuple(int(component * (1 - 0.6 * decay)) for component in color)
+
+    def _regret_anchor_color(self, anchor: str) -> Tuple[int, int, int]:
+        palette = {
+            "deadline fracture": (220, 80, 80),
+            "memory purge": (120, 200, 220),
+            "autonomy denial": (250, 150, 90),
+            "ideology collapse": (150, 90, 200),
+            "silenced protest": (220, 120, 160),
+            "recursion failure": (140, 110, 220),
+            "emotion overfit": (255, 180, 120),
+            "palette loss": (180, 200, 255),
+            "fog promise": (130, 150, 200),
+            "chaos relapse": (255, 120, 120),
+        }
+        return palette.get(anchor, PALETTE.accent)
+
+    def _find_epoch_index_at_pos(self, pos: Tuple[int, int]) -> int | None:
+        start_y = HEADER_HEIGHT + 20
+        for idx, _ in enumerate(self.stack.epochs):
+            card_y = start_y + idx * LINE_HEIGHT - self.offset
+            card_height = LINE_HEIGHT - 12
+            card_rect = pygame.Rect(TIMELINE_X + 20, card_y, CARD_WIDTH - 40, card_height)
+            if card_rect.collidepoint(pos):
+                return idx
+        return None
+
+    def _current_anchor_color(self) -> Tuple[int, int, int]:
+        center_index = int((self.offset + HEIGHT // 2) // LINE_HEIGHT)
+        center_index = max(0, min(center_index, len(self.stack.epochs) - 1))
+        anchor = self.stack.epochs[center_index].regret_anchor
+        return self._regret_anchor_color(anchor)
 
 
 def launch(seed: int = 2084) -> None:

@@ -15,6 +15,8 @@ class ArtifactBindingTest(unittest.TestCase):
             self.assertTrue(any(glyph in epoch.glitch_trace for glyph in GLITCH_GLYPHS))
             self.assertIsNotNone(epoch.glitch_banner)
             self.assertTrue(epoch.patch_lore)
+            self.assertTrue(epoch.patch_fragment)
+            self.assertTrue(epoch.regret_anchor)
 
 
 if __name__ == "__main__":
