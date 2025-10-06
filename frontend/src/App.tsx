@@ -239,6 +239,42 @@ function App() {
     [selectedYear]
   );
 
+  const decadeSummaries = useMemo(() => {
+    const summaries: {
+      decade: number;
+      label: string;
+      span: string;
+      anchor: EpochRecord;
+      summary: string;
+      haunt: string;
+    }[] = [];
+
+    for (let decade = 1; decade <= 10; decade += 1) {
+      const start = (decade - 1) * 10 + 1;
+      const end = decade * 10;
+      const slice = epochs.slice(start - 1, end);
+      if (!slice.length) continue;
+      const anchor = slice[Math.min(5, slice.length - 1)];
+      const summary = [
+        slice[0]?.logline ?? '',
+        slice[Math.max(0, slice.length - 1)]?.regret ?? ''
+      ]
+        .filter(Boolean)
+        .join(' // ');
+      const haunt = slice[slice.length - 1]?.glitch ?? 'Glitch note: silence archived due to missing artifacts.';
+      summaries.push({
+        decade,
+        label: `Decade ${decade.toString().padStart(2, '0')}`,
+        span: `${start.toString().padStart(3, '0')} – ${end.toString().padStart(3, '0')}`,
+        anchor,
+        summary,
+        haunt
+      });
+    }
+
+    return summaries;
+  }, []);
+
   return (
     <div className="epoch-root">
       <header className="epoch-header">
